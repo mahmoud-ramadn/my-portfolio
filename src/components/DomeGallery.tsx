@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useGesture } from "@use-gesture/react";
+import { useGesture } from "@use-gesture/react"
 
-
-
-import { useCallback, useEffect, useMemo, useRef } from "react";
-
-
-
-
+import { useCallback, useEffect, useMemo, useRef } from "react"
 
 type ImageItem = string | { src: string; alt?: string }
 
@@ -57,6 +51,11 @@ const DEFAULT_IMAGES: ImageItem[] = [
   {
     src: "https://scontent.fcai21-4.fna.fbcdn.net/v/t1.6435-9/40007782_883113778556896_7051862217246900224_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Q1F4z00fnxkQ7kNvwGWftL4&_nc_oc=AdmkPrCvS6qFhdDocTfx5xsyI4dBw447hhNxDolUWQRrp_Z7rbv19BRWNd0gvAqlKzM&_nc_zt=23&_nc_ht=scontent.fcai21-4.fna&_nc_gid=mvWNYKnR_LU-696NapAerA&oh=00_AfWcx3hniERj7cQ8Sk3vll55Rz3yk277GqYMiSTvclpsdw&oe=68DEB2D0",
     alt: "Geometric pattern",
+  },
+  {
+    src: "https://scontent.fcai21-3.fna.fbcdn.net/v/t39.30808-6/536572865_2667949473536751_3918993336841375960_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=669761&_nc_ohc=sSlAAJ8rScwQ7kNvwHrXWAg&_nc_oc=AdlyNwLm20S49vQe6tWEQphLUoPrBGAU-nE79lMXyvCu2mpLMUcu40xFgxos2ndKil4&_nc_zt=23&_nc_ht=scontent.fcai21-3.fna&_nc_gid=p1nku2hLQ1--msZSoWU5oA&oh=00_AfUcR3ZGMw7f3a5nZ5iQb_5ZVFbMMu5wG-NrTg7Us95WgA&oe=68BCF9CD",
+
+    alt: "test",
   },
   {
     src: "https://scontent.fcai21-3.fna.fbcdn.net/v/t39.30808-6/472236975_2459299944401706_4070457973693321797_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=669761&_nc_ohc=oZvD1n0XAqcQ7kNvwGDUJzy&_nc_oc=AdmB2B4SSRFB8AoudVpfGfkM2Sfjes71zZMejbppTcmDU-HX-u1u8HYM34VE6_B05d8&_nc_zt=23&_nc_ht=scontent.fcai21-3.fna&_nc_gid=7LH3w9El55Ba0IdHBhjKDw&oh=00_AfVZyDe5MgqcN0mbWHaUCtrkyKBjZ0pyKr-U4eyTLYc2Kg&oe=68BD1E1A",
