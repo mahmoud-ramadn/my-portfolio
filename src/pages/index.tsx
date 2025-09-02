@@ -39,7 +39,7 @@ text={[
 
         </div>
 
-        <div  style={{ width: '100vw', height: "50vh" }} className="  p-10 overflow-hidden rounded-full">
+        <div  style={{ width: '100vw', height: "50vh" }} className="  overflow-hidden rounded-full">
           <DomeGallery  segments={20} openedImageWidth="400px" openedImageHeight="400px" grayscale={false} />
         </div>
     </div>
