@@ -11,7 +11,11 @@ export default function Home() {
         <div className=" my-10 flex items-center   h-[500px] flex-col justify-center"> 
 
         <TextType
-          text={["Hi, I'm Mahmoud Ramadan", "Front-End Developer", "Vue, Nuxt & React"]}
+text={[
+  "Hey there, friends! 😊",
+  "Wishing you all a wonderful day!",
+  "Stay happy and keep shining! ✨"
+]}
           typingSpeed={75}
           pauseDuration={1500}
           className=" text-7xl font-semibold text-center"
