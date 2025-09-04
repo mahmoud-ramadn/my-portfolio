@@ -1,14 +1,32 @@
 import { Heart, MapPin, MessageCircle, MoreHorizontal, Share, ThumbsUp } from "lucide-react"
+import { useState } from "react"
 
 import { Link } from "react-router"
 
 import type { Post as PostType } from "@/lib/fakeData"
+import { usePosts } from "@/lib/useApi"
 
 interface PostProps {
   post: PostType
 }
 
 export default function Post({ post }: PostProps) {
+  const { toggleLike } = usePosts()
+  const [isLiking, setIsLiking] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+
+  const handleLike = async () => {
+    if (isLiking) return
+    
+    setIsLiking(true)
+    try {
+      await toggleLike(post.id)
+    } catch (error) {
+      console.error('Error toggling like:', error)
+    } finally {
+      setIsLiking(false)
+    }
+  }
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       {/* Post Header */}
@@ -99,15 +117,20 @@ export default function Post({ post }: PostProps) {
       {/* Action Buttons */}
       <div className="flex border-t border-gray-100">
         <button
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 hover:bg-gray-50 transition-colors ${
+          onClick={handleLike}
+          disabled={isLiking}
+          className={`flex-1 flex items-center justify-center space-x-2 py-3 hover:bg-gray-50 transition-colors disabled:opacity-50 ${
             post.isLiked ? "text-blue-600" : "text-gray-600"
           }`}
         >
-          <ThumbsUp className={`w-5 h-5 ${post.isLiked ? "fill-current" : ""}`} />
+          <ThumbsUp className={`w-5 h-5 ${post.isLiked ? "fill-current" : ""} ${isLiking ? "animate-pulse" : ""}`} />
           <span className="font-medium">{post.isLiked ? "Liked" : "Like"}</span>
         </button>
 
-        <button className="flex-1 flex items-center justify-center space-x-2 py-3 hover:bg-gray-50 transition-colors">
+        <button 
+          onClick={() => setShowComments(!showComments)}
+          className="flex-1 flex items-center justify-center space-x-2 py-3 hover:bg-gray-50 transition-colors"
+        >
           <MessageCircle className="w-5 h-5 text-gray-500" />
           <span className="text-gray-600 font-medium">Comment</span>
         </button>
@@ -117,6 +140,23 @@ export default function Post({ post }: PostProps) {
           <span className="text-gray-600 font-medium">Share</span>
         </button>
       </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <div className="border-t border-gray-100 p-4">
+          <div className="flex items-center space-x-3 mb-4">
+            <img src={post.user.avatar} alt="User" className="w-8 h-8 rounded-full" />
+            <input
+              type="text"
+              placeholder="Write a comment..."
+              className="flex-1 bg-gray-100 rounded-full px-4 py-2 focus:outline-none focus:bg-white focus:shadow-md transition-all"
+            />
+          </div>
+          <div className="text-sm text-gray-500 text-center">
+            💡 Comments are loaded from API when you interact with them!
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -17,7 +17,7 @@ export default function DefaultLayout() {
   }
 
   return (
-    <main className="min-h-screen  overflow-hidden flex flex-col bg-black">
+    <main className="min-h-screen   flex flex-col bg-black">
       <Hero />
       <SplashCursor />
       <main className=" container mx-auto px-4 ">

@@ -1,3 +1,465 @@
+// API Configuration
+export const API_BASE_URL = "https://jsonplaceholder.typicode.com"
+export const PRODUCTS_API_URL = "https://dummyjson.com"
+
+// DummyJSON API Response interfaces
+interface DummyProduct {
+  id: number
+  title: string
+  description: string
+  price: number
+  discountPercentage: number
+  rating: number
+  stock: number
+  brand: string
+  category: string
+  thumbnail: string
+  images: string[]
+}
+
+interface DummyProductsResponse {
+  products: DummyProduct[]
+  total: number
+  skip: number
+  limit: number
+}
+
+// API Response interfaces
+interface ApiPost {
+  id: number
+  userId: number
+  title: string
+  body: string
+}
+
+interface ApiUser {
+  id: number
+  name: string
+  username: string
+  email: string
+  website: string
+  company: {
+    catchPhrase: string
+  }
+  address: {
+    city: string
+    zipcode: string
+  }
+}
+
+interface ApiComment {
+  id: number
+  postId: number
+  name: string
+  email: string
+  body: string
+}
+
+// API Service Functions
+export const apiService = {
+  // Fetch posts from API
+  async getPosts(): Promise<Post[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts`)
+      const posts: ApiPost[] = await response.json()
+
+      // Transform API data to match our interface
+      return posts.slice(0, 10).map((post: ApiPost, index: number) => ({
+        id: post.id,
+        content: post.body,
+        user: {
+          id: post.userId,
+          name: fakeUsers[index % fakeUsers.length].name,
+          username: fakeUsers[index % fakeUsers.length].username,
+          avatar: `https://i.pravatar.cc/150?img=${post.userId}`,
+          coverPhoto: `https://picsum.photos/850/320?random=${post.userId}`,
+          bio: fakeUsers[index % fakeUsers.length].bio,
+          location: fakeUsers[index % fakeUsers.length].location,
+          website: fakeUsers[index % fakeUsers.length].website,
+          joinDate: fakeUsers[index % fakeUsers.length].joinDate,
+          friends: Math.floor(Math.random() * 1000) + 100,
+          following: Math.floor(Math.random() * 800) + 50,
+          followers: Math.floor(Math.random() * 2000) + 200,
+          isOnline: Math.random() > 0.5,
+          lastSeen: Math.random() > 0.7 ? `${Math.floor(Math.random() * 24)} hours ago` : undefined,
+        },
+        type: "text" as const,
+        media:
+          Math.random() > 0.6
+            ? [
+                {
+                  type: "image" as const,
+                  url: `https://picsum.photos/600/400?random=${post.id}`,
+                },
+              ]
+            : undefined,
+        timestamp: new Date(Date.now() - Math.random() * 86400000 * 7).toLocaleString(),
+        likes: Math.floor(Math.random() * 500),
+        comments: Math.floor(Math.random() * 50),
+        shares: Math.floor(Math.random() * 20),
+        isLiked: Math.random() > 0.7,
+        location: Math.random() > 0.6 ? fakeUsers[index % fakeUsers.length].location : undefined,
+      }))
+    } catch (error) {
+      console.error("Error fetching posts from API:", error)
+      return fakePosts // Fallback to local data
+    }
+  },
+
+  // Fetch users from API
+  async getUsers(): Promise<User[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users`)
+      const users: ApiUser[] = await response.json()
+
+      return users.map((user: ApiUser) => ({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        avatar: `https://i.pravatar.cc/150?img=${user.id}`,
+        coverPhoto: `https://picsum.photos/850/320?random=${user.id + 100}`,
+        bio: `${user.company.catchPhrase} | ${user.address.city}`,
+        location: `${user.address.city}, ${user.address.zipcode}`,
+        website: user.website,
+        joinDate: "January 2020",
+        friends: Math.floor(Math.random() * 1000) + 100,
+        following: Math.floor(Math.random() * 800) + 50,
+        followers: Math.floor(Math.random() * 2000) + 200,
+        isOnline: Math.random() > 0.5,
+        lastSeen: Math.random() > 0.7 ? `${Math.floor(Math.random() * 24)} hours ago` : undefined,
+      }))
+    } catch (error) {
+      console.error("Error fetching users from API:", error)
+      return fakeUsers // Fallback to local data
+    }
+  },
+
+  // Fetch comments for a specific post
+  async getComments(postId: number) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`)
+      const comments: ApiComment[] = await response.json()
+
+      return comments.slice(0, 5).map((comment: ApiComment) => ({
+        id: comment.id,
+        content: comment.body,
+        user: {
+          id: comment.id,
+          name: comment.name,
+          username: comment.email.split("@")[0],
+          avatar: `https://i.pravatar.cc/150?img=${comment.id + 50}`,
+        },
+        timestamp: new Date(Date.now() - Math.random() * 86400000).toLocaleString(),
+        likes: Math.floor(Math.random() * 20),
+      }))
+    } catch (error) {
+      console.error("Error fetching comments:", error)
+      return []
+    }
+  },
+
+  // Create a new post
+  async createPost(content: string, userId: number = 1): Promise<Post | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts`, {
+        method: "POST",
+        body: JSON.stringify({
+          title: content.slice(0, 50),
+          body: content,
+          userId: userId,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      })
+      const newPost: ApiPost = await response.json()
+
+      return {
+        id: newPost.id,
+        content: newPost.body,
+        user: fakeUsers[0], // Current user
+        type: "text",
+        timestamp: new Date().toLocaleString(),
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        isLiked: false,
+      }
+    } catch (error) {
+      console.error("Error creating post:", error)
+      return null
+    }
+  },
+
+  // Like/Unlike a post
+  async toggleLike(postId: number): Promise<boolean> {
+    try {
+      // Simulate API call (in real app, would send postId to server)
+      console.log(`Toggling like for post ${postId}`)
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      return Math.random() > 0.1 // 90% success rate
+    } catch (error) {
+      console.error("Error toggling like:", error)
+      return false
+    }
+  },
+
+  // Fetch marketplace products from DummyJSON
+  async getProducts(filters?: {
+    category?: string
+    priceRange?: string
+    condition?: string
+    searchQuery?: string
+    sortBy?: string
+    limit?: number
+    skip?: number
+  }): Promise<Product[]> {
+    try {
+      // Simulate API delay for realistic loading
+      await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200))
+
+      let url = `${PRODUCTS_API_URL}/products`
+      const params = new URLSearchParams()
+
+      // Apply search query
+      if (filters?.searchQuery?.trim()) {
+        url = `${PRODUCTS_API_URL}/products/search`
+        params.append("q", filters.searchQuery.trim())
+      }
+
+      // Apply category filter
+      if (filters?.category && filters.category !== "all") {
+        url = `${PRODUCTS_API_URL}/products/category/${encodeURIComponent(filters.category)}`
+      }
+
+      // Add pagination
+      params.append("limit", String(filters?.limit || 20))
+      params.append("skip", String(filters?.skip || 0))
+
+      // Add sorting
+      if (filters?.sortBy) {
+        switch (filters.sortBy) {
+          case "price-low":
+            params.append("sortBy", "price")
+            params.append("order", "asc")
+            break
+          case "price-high":
+            params.append("sortBy", "price")
+            params.append("order", "desc")
+            break
+          case "rating":
+            params.append("sortBy", "rating")
+            params.append("order", "desc")
+            break
+        }
+      }
+
+      const fullUrl = `${url}?${params.toString()}`
+      console.log("Fetching from DummyJSON:", fullUrl)
+
+      const response = await fetch(fullUrl)
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`)
+      }
+
+      const data: DummyProductsResponse = await response.json()
+
+      // Transform DummyJSON products to our Product interface
+      let products = data.products.map((product: DummyProduct, index: number) => ({
+        id: product.id,
+        title: product.title,
+        price: Math.round(product.price),
+        currency: "$",
+        image: product.thumbnail,
+        seller: {
+          id: (product.id % fakeUsers.length) + 1,
+          name: fakeUsers[index % fakeUsers.length].name,
+          username: fakeUsers[index % fakeUsers.length].username,
+          avatar: fakeUsers[index % fakeUsers.length].avatar,
+          coverPhoto: fakeUsers[index % fakeUsers.length].coverPhoto,
+          bio: fakeUsers[index % fakeUsers.length].bio,
+          location: fakeUsers[index % fakeUsers.length].location,
+          website: fakeUsers[index % fakeUsers.length].website,
+          joinDate: fakeUsers[index % fakeUsers.length].joinDate,
+          friends: fakeUsers[index % fakeUsers.length].friends,
+          following: fakeUsers[index % fakeUsers.length].following,
+          followers: fakeUsers[index % fakeUsers.length].followers,
+          isOnline: fakeUsers[index % fakeUsers.length].isOnline,
+          lastSeen: fakeUsers[index % fakeUsers.length].lastSeen,
+        },
+        category: this.mapDummyCategory(product.category),
+        condition: this.getRandomCondition(),
+        location: this.getRandomLocation(),
+        description: product.description,
+        rating: Math.round(product.rating * 10) / 10,
+        reviews: Math.floor(Math.random() * 200) + 10,
+        isAvailable: product.stock > 0,
+        tags: [product.brand, product.category].filter(Boolean),
+        isFavorite: false,
+      }))
+
+      // Apply client-side filters for options not supported by DummyJSON
+      if (filters?.condition && filters.condition !== "all") {
+        products = products.filter((product) => product.condition === filters.condition)
+      }
+
+      if (filters?.priceRange && filters.priceRange !== "all") {
+        products = products.filter((product) => {
+          switch (filters.priceRange) {
+            case "under100":
+              return product.price < 100
+            case "100-500":
+              return product.price >= 100 && product.price <= 500
+            case "500-1000":
+              return product.price >= 500 && product.price <= 1000
+            case "over1000":
+              return product.price > 1000
+            default:
+              return true
+          }
+        })
+      }
+
+      return products
+    } catch (error) {
+      console.error("Error fetching products from DummyJSON:", error)
+      return fakeProducts.slice(0, filters?.limit || 20) // Fallback to local data
+    }
+  },
+
+  // Helper method to map DummyJSON categories to our categories
+  mapDummyCategory(category: string): string {
+    const categoryMap: Record<string, string> = {
+      smartphones: "Electronics",
+      laptops: "Computers",
+      fragrances: "Fashion",
+      skincare: "Fashion",
+      groceries: "Home",
+      "home-decoration": "Home",
+      furniture: "Home",
+      tops: "Fashion",
+      "womens-dresses": "Fashion",
+      "womens-shoes": "Fashion",
+      "mens-shirts": "Fashion",
+      "mens-shoes": "Fashion",
+      "mens-watches": "Fashion",
+      "womens-watches": "Fashion",
+      "womens-bags": "Fashion",
+      "womens-jewellery": "Fashion",
+      sunglasses: "Fashion",
+      automotive: "Vehicles",
+      motorcycle: "Vehicles",
+      lighting: "Home",
+      "sports-accessories": "Sports",
+    }
+    return categoryMap[category] || "Electronics"
+  },
+
+  // Helper method to get random condition
+  getRandomCondition(): "new" | "used" | "refurbished" {
+    const weights = [0.4, 0.5, 0.1] // 40% new, 50% used, 10% refurbished
+    const random = Math.random()
+
+    if (random < weights[0]) return "new"
+    if (random < weights[0] + weights[1]) return "used"
+    return "refurbished"
+  },
+
+  // Helper method to get random location
+  getRandomLocation(): string {
+    const locations = [
+      "New York, NY",
+      "Los Angeles, CA",
+      "Chicago, IL",
+      "Houston, TX",
+      "Phoenix, AZ",
+      "Philadelphia, PA",
+      "San Antonio, TX",
+      "San Diego, CA",
+      "Dallas, TX",
+      "San Jose, CA",
+      "Austin, TX",
+      "Jacksonville, FL",
+      "Fort Worth, TX",
+      "Columbus, OH",
+      "Charlotte, NC",
+      "San Francisco, CA",
+      "Indianapolis, IN",
+      "Seattle, WA",
+      "Denver, CO",
+      "Boston, MA",
+    ]
+    return locations[Math.floor(Math.random() * locations.length)]
+  },
+
+  // Get available categories from DummyJSON
+  async getCategories(): Promise<string[]> {
+    try {
+      const response = await fetch(`${PRODUCTS_API_URL}/products/categories`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.status}`)
+      }
+      const categories: string[] = await response.json()
+      return categories
+    } catch (error) {
+      console.error("Error fetching categories from DummyJSON:", error)
+      return ["smartphones", "laptops", "fragrances", "skincare", "groceries", "home-decoration"]
+    }
+  },
+
+  // Get product by ID from DummyJSON
+  async getProductById(productId: number): Promise<Product | null> {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300))
+
+      const response = await fetch(`${PRODUCTS_API_URL}/products/${productId}`)
+      if (!response.ok) {
+        throw new Error(`Product not found: ${response.status}`)
+      }
+
+      const dummyProduct: DummyProduct = await response.json()
+
+      // Transform to our Product interface
+      const product: Product = {
+        id: dummyProduct.id,
+        title: dummyProduct.title,
+        price: Math.round(dummyProduct.price),
+        currency: "$",
+        image: dummyProduct.thumbnail,
+        seller: fakeUsers[0], // Use first user as seller
+        category: this.mapDummyCategory(dummyProduct.category),
+        condition: this.getRandomCondition(),
+        location: this.getRandomLocation(),
+        description: dummyProduct.description,
+        rating: Math.round(dummyProduct.rating * 10) / 10,
+        reviews: Math.floor(Math.random() * 200) + 10,
+        isAvailable: dummyProduct.stock > 0,
+        tags: [dummyProduct.brand, dummyProduct.category].filter(Boolean),
+        isFavorite: false,
+      }
+
+      return product
+    } catch (error) {
+      console.error("Error fetching product from DummyJSON:", error)
+      // Fallback to local data
+      const fallbackProduct = fakeProducts.find((p) => p.id === productId)
+      return fallbackProduct || null
+    }
+  },
+
+  // Toggle product favorite/bookmark
+  async toggleProductFavorite(productId: number): Promise<boolean> {
+    try {
+      console.log(`Toggling favorite for product ${productId}`)
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      return Math.random() > 0.1 // 90% success rate
+    } catch (error) {
+      console.error("Error toggling favorite:", error)
+      return false
+    }
+  },
+}
+
 export interface User {
   id: number
   name: string
@@ -349,6 +811,7 @@ export interface Product {
   reviews: number
   isAvailable: boolean
   tags: string[]
+  isFavorite?: boolean
 }
 
 // Marketplace/Shop data
@@ -367,11 +830,11 @@ export const fakeProducts: Product[] = [
     rating: 4.9,
     reviews: 127,
     isAvailable: true,
-    tags: ["smartphone", "apple", "technology"]
+    tags: ["smartphone", "apple", "technology"],
   },
   {
     id: 2,
-    title: "MacBook Pro 16\" M3 Pro",
+    title: 'MacBook Pro 16" M3 Pro',
     price: 2499,
     currency: "$",
     image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop",
@@ -383,7 +846,7 @@ export const fakeProducts: Product[] = [
     rating: 4.7,
     reviews: 89,
     isAvailable: true,
-    tags: ["laptop", "apple", "programming"]
+    tags: ["laptop", "apple", "programming"],
   },
   {
     id: 3,
@@ -399,7 +862,7 @@ export const fakeProducts: Product[] = [
     rating: 4.8,
     reviews: 203,
     isAvailable: true,
-    tags: ["sneakers", "nike", "basketball"]
+    tags: ["sneakers", "nike", "basketball"],
   },
   {
     id: 4,
@@ -415,7 +878,7 @@ export const fakeProducts: Product[] = [
     rating: 4.9,
     reviews: 156,
     isAvailable: true,
-    tags: ["camera", "photography", "professional"]
+    tags: ["camera", "photography", "professional"],
   },
   {
     id: 5,
@@ -431,7 +894,7 @@ export const fakeProducts: Product[] = [
     rating: 5.0,
     reviews: 67,
     isAvailable: true,
-    tags: ["gaming", "pc", "rtx"]
+    tags: ["gaming", "pc", "rtx"],
   },
   {
     id: 6,
@@ -447,7 +910,7 @@ export const fakeProducts: Product[] = [
     rating: 4.6,
     reviews: 43,
     isAvailable: true,
-    tags: ["vintage", "leather", "fashion"]
+    tags: ["vintage", "leather", "fashion"],
   },
   {
     id: 7,
@@ -463,7 +926,7 @@ export const fakeProducts: Product[] = [
     rating: 4.8,
     reviews: 24,
     isAvailable: true,
-    tags: ["electric", "tesla", "car"]
+    tags: ["electric", "tesla", "car"],
   },
   {
     id: 8,
@@ -479,7 +942,7 @@ export const fakeProducts: Product[] = [
     rating: 4.7,
     reviews: 38,
     isAvailable: true,
-    tags: ["furniture", "dining", "wood"]
+    tags: ["furniture", "dining", "wood"],
   },
   {
     id: 9,
@@ -495,7 +958,7 @@ export const fakeProducts: Product[] = [
     rating: 4.9,
     reviews: 156,
     isAvailable: true,
-    tags: ["playstation", "gaming", "console"]
+    tags: ["playstation", "gaming", "console"],
   },
   {
     id: 10,
@@ -511,7 +974,7 @@ export const fakeProducts: Product[] = [
     rating: 4.6,
     reviews: 72,
     isAvailable: true,
-    tags: ["bike", "mountain", "sports"]
+    tags: ["bike", "mountain", "sports"],
   },
   {
     id: 11,
@@ -527,7 +990,7 @@ export const fakeProducts: Product[] = [
     rating: 4.8,
     reviews: 94,
     isAvailable: true,
-    tags: ["luxury", "handbag", "designer"]
+    tags: ["luxury", "handbag", "designer"],
   },
   {
     id: 12,
@@ -543,7 +1006,7 @@ export const fakeProducts: Product[] = [
     rating: 4.5,
     reviews: 128,
     isAvailable: true,
-    tags: ["security", "smart-home", "electronics"]
+    tags: ["security", "smart-home", "electronics"],
   },
   {
     id: 13,
@@ -559,7 +1022,7 @@ export const fakeProducts: Product[] = [
     rating: 4.7,
     reviews: 85,
     isAvailable: true,
-    tags: ["guitar", "music", "fender"]
+    tags: ["guitar", "music", "fender"],
   },
   {
     id: 14,
@@ -575,7 +1038,7 @@ export const fakeProducts: Product[] = [
     rating: 4.8,
     reviews: 47,
     isAvailable: true,
-    tags: ["baby", "stroller", "kids"]
+    tags: ["baby", "stroller", "kids"],
   },
   {
     id: 15,
@@ -591,8 +1054,8 @@ export const fakeProducts: Product[] = [
     rating: 4.4,
     reviews: 31,
     isAvailable: true,
-    tags: ["books", "education", "computer-science"]
-  }
+    tags: ["books", "education", "computer-science"],
+  },
 ]
 
 // Fake stories data
@@ -644,7 +1107,7 @@ export const fakeStories: Story[] = [
     media: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=200&fit=crop",
     timestamp: "2 days ago",
     isViewed: true,
-  }
+  },
 ]
 
 // Search function
