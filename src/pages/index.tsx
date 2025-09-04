@@ -30,8 +30,8 @@ export default function Home() {
         />
       </div>
 
-      <div style={{ width: "100vw", height: "100vh"  }} className="  overflow-hidden rounded-full">
-        <DomeGallery segments={20} openedImageWidth="320px" openedImageHeight="320px" grayscale={false} />
+      <div style={{ width: "100vw", height: "100vh"  }} className="  rounded-full">
+        <DomeGallery segments={20}  openedImageWidth="320px" minRadius={300} openedImageHeight="320px" grayscale={false}  />
       </div>
     </div>
   )
