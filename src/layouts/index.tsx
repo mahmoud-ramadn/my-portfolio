@@ -10,7 +10,7 @@ export default function DefaultLayout() {
 
   if (isFacebookPage) {
     return (
-      <main className="min-h-screen bg-gray-100">
+      <main className="min-h-screen  overflow-hidden bg-gray-100">
         <Outlet />
       </main>
     )

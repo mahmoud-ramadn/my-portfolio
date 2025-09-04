@@ -6,7 +6,7 @@ import Stories from "./Stories.tsx"
 
 export default function FacebookFeed() {
   return (
-    <div className="py-6 space-y-6 max-w-2xl mx-auto">
+    <div className="py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Stories */}
       <Stories />
 

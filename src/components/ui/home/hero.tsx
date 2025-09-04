@@ -8,12 +8,12 @@ export default function Hero() {
   return (
     <>
       {/* Navigation */}
-      <header className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <nav className="bg-white/10 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
-          <div className="flex items-center space-x-6">
+      <header className="fixed top-2 sm:top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-xs sm:max-w-md px-4 sm:px-0">
+        <nav className="bg-white/10 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-3 border border-white/20">
+          <div className="flex items-center justify-center space-x-4 sm:space-x-6">
             <Link
               to="/"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-xs sm:text-sm font-medium transition-colors ${
                 location.pathname === "/" ? "text-white" : "text-gray-300 hover:text-white"
               }`}
             >
@@ -21,7 +21,7 @@ export default function Hero() {
             </Link>
             <Link
               to="/facebook"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-xs sm:text-sm font-medium transition-colors ${
                 location.pathname === "/facebook" ? "text-white" : "text-gray-300 hover:text-white"
               }`}
             >
@@ -32,7 +32,7 @@ export default function Hero() {
       </header>
 
       {/* Light Rays Background */}
-      <div style={{ width: "100%", height: "600px", position: "relative" }}>
+      <div className="w-full h-80 sm:h-96 lg:h-[600px] relative">
         <LightRays
           raysOrigin="top-center"
           raysColor="#00ffff"

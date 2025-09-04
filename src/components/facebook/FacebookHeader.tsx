@@ -22,6 +22,7 @@ export default function FacebookHeader() {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [searchResults, setSearchResults] = useState<{ users: User[]; posts: Post[] }>({ users: [], posts: [] })
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const location = useLocation()
 
   const handleSearch = (query: string) => {
@@ -52,7 +53,7 @@ export default function FacebookHeader() {
               facebook
             </Link>
 
-            <div className="relative max-w-md">
+            <div className="relative max-w-md flex-1 max-w-xs sm:max-w-sm lg:max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
@@ -60,7 +61,7 @@ export default function FacebookHeader() {
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 onFocus={() => searchQuery && setShowSearchResults(true)}
-                className="bg-gray-100 rounded-full pl-10 pr-10 py-2 w-80 focus:outline-none focus:bg-white focus:shadow-md transition-all"
+                className="bg-gray-100 rounded-full pl-10 pr-10 py-2 w-full focus:outline-none focus:bg-white focus:shadow-md transition-all"
               />
               {searchQuery && (
                 <button
@@ -107,8 +108,16 @@ export default function FacebookHeader() {
             </button>
           </div>
 
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
           {/* Right Section - User Actions */}
-          <div className="flex items-center space-x-2 flex-1 justify-end">
+          <div className="hidden md:flex items-center space-x-2 flex-1 justify-end">
             <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
               <Menu className="w-5 h-5" />
             </button>
@@ -143,11 +152,88 @@ export default function FacebookHeader() {
         </div>
       </header>
 
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" onClick={() => setShowMobileMenu(false)} />
+          <div className="fixed top-16 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden">
+            <div className="p-4">
+              {/* Mobile Navigation */}
+              <div className="grid grid-cols-5 gap-4 mb-6">
+                <Link 
+                  to="/facebook" 
+                  className={`flex flex-col items-center p-3 rounded-lg transition-colors ${
+                    location.pathname === '/facebook' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <Home className="w-6 h-6 mb-1" />
+                  <span className="text-xs">Home</span>
+                </Link>
+                <button className="flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+                  <Users className="w-6 h-6 mb-1" />
+                  <span className="text-xs">Friends</span>
+                </button>
+                <button className="flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+                  <Play className="w-6 h-6 mb-1" />
+                  <span className="text-xs">Watch</span>
+                </button>
+                <Link 
+                  to="/facebook/marketplace" 
+                  className={`flex flex-col items-center p-3 rounded-lg transition-colors relative ${
+                    location.pathname === '/facebook/marketplace' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <Store className="w-6 h-6 mb-1" />
+                  <span className="text-xs">Marketplace</span>
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </Link>
+                <button className="flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+                  <ShoppingBag className="w-6 h-6 mb-1" />
+                  <span className="text-xs">Shop</span>
+                </button>
+              </div>
+
+              {/* Mobile User Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <Link
+                  to="/facebook/profile/1"
+                  className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 rounded-lg p-2 flex-1"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+                    alt="User"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <span className="font-medium text-gray-900">Your Profile</span>
+                </Link>
+                <div className="flex space-x-2">
+                  <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors relative">
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                  </button>
+                  <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors relative">
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">5</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Search Results Dropdown */}
       {showSearchResults && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setShowSearchResults(false)} />
-          <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 w-96 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
+          <div className="fixed top-16 left-4 right-4 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:right-auto sm:w-96 z-50 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
             {searchResults.users.length === 0 && searchResults.posts.length === 0 ? (
               <div className="p-4 text-gray-500 text-center">No results found for "{searchQuery}"</div>
             ) : (
