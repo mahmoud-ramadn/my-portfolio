@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 
 import { useState } from "react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 
 import { type Post, type User, searchPosts, searchUsers } from "@/lib/fakeData"
 
@@ -22,6 +22,7 @@ export default function FacebookHeader() {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [searchResults, setSearchResults] = useState<{ users: User[]; posts: Post[] }>({ users: [], posts: [] })
+  const location = useLocation()
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -74,19 +75,33 @@ export default function FacebookHeader() {
 
           {/* Center Section - Navigation */}
           <div className="hidden md:flex items-center space-x-2 flex-1 justify-center">
-            <button className="p-3 rounded-lg hover:bg-gray-100 text-blue-600 border-b-4 border-blue-600 transition-colors">
+            <Link 
+              to="/facebook" 
+              className={`p-3 rounded-lg hover:bg-gray-100 transition-colors ${
+                location.pathname === '/facebook' 
+                  ? 'text-blue-600 border-b-4 border-blue-600' 
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+            >
               <Home className="w-6 h-6" />
-            </button>
+            </Link>
             <button className="p-3 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors">
               <Users className="w-6 h-6" />
             </button>
             <button className="p-3 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors">
               <Play className="w-6 h-6" />
             </button>
-            <button className="p-3 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors relative">
+            <Link 
+              to="/facebook/marketplace" 
+              className={`p-3 rounded-lg hover:bg-gray-100 transition-colors relative ${
+                location.pathname === '/facebook/marketplace' 
+                  ? 'text-blue-600 border-b-4 border-blue-600' 
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+            >
               <Store className="w-6 h-6" />
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-            </button>
+            </Link>
             <button className="p-3 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors">
               <ShoppingBag className="w-6 h-6" />
             </button>

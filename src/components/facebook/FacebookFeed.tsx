@@ -1,7 +1,6 @@
 import { fakePosts } from "@/lib/fakeData"
 
 import CreatePost from "./CreatePost.tsx"
-import Marketplace from "./Marketplace.tsx"
 import Post from "./Post.tsx"
 import Stories from "./Stories.tsx"
 
@@ -14,10 +13,7 @@ export default function FacebookFeed() {
       {/* Create Post */}
       <CreatePost />
 
-      {/* Marketplace */}
-      <Marketplace />
-
-      {/* Posts */}
+   
       {fakePosts.map((post) => (
         <Post key={post.id} post={post} />
       ))}
